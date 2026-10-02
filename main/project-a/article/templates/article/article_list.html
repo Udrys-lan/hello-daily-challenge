@@ -1,0 +1,39 @@
+{% extends "article/base.html" %}
+{% block title %}文章列表 · 文章管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1 style="margin-top:0;">📚 文章列表</h1>
+    <p class="meta-text">共 {{ articles|length }} 篇已发布/未删除文章</p>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+        {% for a in articles %}
+        <div style="border:1px solid var(--border); border-radius:12px; padding:16px 18px; background:#fbfcff; transition:all .2s;">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <a href="{% url 'article_detail' a.pk %}" style="font-size:17px; font-weight:600; text-decoration:none; color:var(--text);">
+                    {{ a.title }}
+                </a>
+                {% if a.status == 'draft' %}<span class="badge badge-draft">草稿</span>
+                {% elif a.status == 'published' %}<span class="badge badge-published">已发布</span>
+                {% elif a.status == 'archived' %}<span class="badge badge-archived">已归档</span>{% endif %}
+            </div>
+            <div class="meta-text" style="margin-top:8px;">
+                ✍️ {{ a.author.username }} ｜ 👁 {{ a.views }} 次浏览 ｜ 🕒 {{ a.created_at|date:"Y-m-d H:i" }}
+            </div>
+            {% if a.author == user %}
+            <form action="{% url 'soft_delete' a.pk %}" method="post" style="margin-top:10px;"
+                  onsubmit="return confirm('确认软删除该文章？');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">🗑 软删除</button>
+            </form>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align:center; padding:40px 0; color:var(--muted);">
+            <div style="font-size:40px;">📭</div>
+            <p>暂无文章，去<a href="/admin/">管理后台</a>创建一篇吧。</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

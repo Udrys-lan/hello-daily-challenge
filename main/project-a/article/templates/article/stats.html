@@ -1,0 +1,71 @@
+{% extends "article/base.html" %}
+{% block title %}系统统计 · 文章管理系统{% endblock %}
+
+{% block content %}
+<h1 style="margin:0 0 18px;">📊 系统统计</h1>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:16px; margin-bottom:20px;">
+    <div class="card" style="margin:0; text-align:center;">
+        <div style="font-size:36px;">📚</div>
+        <div style="font-size:30px; font-weight:700; color:var(--primary-dark);">{{ total_articles }}</div>
+        <div class="meta-text">文章总量</div>
+    </div>
+    <div class="card" style="margin:0; text-align:center;">
+        <div style="font-size:36px;">👁</div>
+        <div style="font-size:30px; font-weight:700; color:var(--accent);">{{ total_views }}</div>
+        <div class="meta-text">全部总浏览量</div>
+    </div>
+    <div class="card" style="margin:0; text-align:center;">
+        <div style="font-size:36px;">🧾</div>
+        <div style="font-size:30px; font-weight:700; color:var(--warning);">{{ status_stats|length }}</div>
+        <div class="meta-text">状态分类数</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">🗂 各状态文章数量</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:12px;">
+        {% for s in status_stats %}
+        <div style="border:1px solid var(--border); border-radius:10px; padding:14px; background:#fbfcff; text-align:center;">
+            {% if s.status == 'draft' %}<span class="badge badge-draft">草稿</span>
+            {% elif s.status == 'published' %}<span class="badge badge-published">已发布</span>
+            {% elif s.status == 'archived' %}<span class="badge badge-archived">已归档</span>
+            {% else %}<span class="badge badge-draft">{{ s.status }}</span>{% endif %}
+            <div style="font-size:26px; font-weight:700; margin-top:8px;">{{ s.cnt }}</div>
+        </div>
+        {% empty %}
+        <div class="meta-text">暂无数据</div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">🕵️ 最近 10 条审计日志</h2>
+    <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+        <thead>
+            <tr style="background:var(--primary-soft);">
+                <th style="padding:10px 12px; text-align:left; border-radius:8px 0 0 8px;">时间</th>
+                <th style="padding:10px 12px; text-align:left;">操作</th>
+                <th style="padding:10px 12px; text-align:left; border-radius:0 8px 8px 0;">变更</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in recent_logs %}
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:10px 12px; color:var(--muted); white-space:nowrap;">{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                <td style="padding:10px 12px;">
+                    <span class="badge badge-published" style="background:var(--primary-soft); color:var(--primary-dark);">
+                        {{ log.get_operation_display }}
+                    </span>
+                </td>
+                <td style="padding:10px 12px; font-size:13px;">{{ log.diff }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" style="padding:20px; text-align:center; color:var(--muted);">暂无日志</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</div>
+{% endblock %}
