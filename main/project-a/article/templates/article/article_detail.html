@@ -1,0 +1,80 @@
+{% extends "article/base.html" %}
+{% block title %}{{ article.title }} · 文章管理系统{% endblock %}
+
+{% block content %}
+<div class="card">
+    <p class="meta-text"><a href="{% url 'article_list' %}">← 返回文章列表</a></p>
+    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:6px;">
+        <h1 style="margin:0;">{{ article.title }}</h1>
+        {% if article.status == 'draft' %}<span class="badge badge-draft">草稿</span>
+        {% elif article.status == 'published' %}<span class="badge badge-published">已发布</span>
+        {% elif article.status == 'archived' %}<span class="badge badge-archived">已归档</span>{% endif %}
+    </div>
+    <div class="meta-text" style="margin-top:12px;">
+        ✍️ {{ article.author.username }} ｜ 👁 {{ article.views }} 次浏览<br>
+        🕒 创建 {{ article.created_at|date:"Y-m-d H:i:s" }} ｜ 更新 {{ article.updated_at|date:"Y-m-d H:i:s" }}
+    </div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">📝 正文</h2>
+    <div style="white-space:pre-wrap; font-size:15.5px;">{{ article.content }}</div>
+</div>
+
+<div class="card">
+    <h2 class="card-title">📎 附件 <span style="font-size:13px; color:var(--muted);">({{ attachments|length }})</span></h2>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+        {% for att in attachments %}
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+                    border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:#fbfcff;">
+            <div>
+                <a href="{% url 'att_download' att.pk %}" style="font-weight:600;">⬇️ {{ att.file_name }}</a>
+                <span class="meta-text">（已下载 {{ att.downloads }} 次）</span>
+            </div>
+            {% if article.author == user %}
+            <form action="{% url 'att_delete' att.pk %}" method="post" onsubmit="return confirm('确认删除该附件？');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">删除</button>
+            </form>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div style="text-align:center; padding:24px 0; color:var(--muted);">暂无附件</div>
+        {% endfor %}
+    </div>
+
+    {% if article.author == user %}
+    <div style="margin-top:16px; padding-top:16px; border-top:1px dashed var(--border);">
+        <div class="card-title" style="margin-bottom:10px;">⬆️ 上传新附件</div>
+        <form action="{% url 'att_upload' article.pk %}" method="post" enctype="multipart/form-data"
+              style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="file" name="file" required style="padding:6px; border:1px solid var(--border); border-radius:8px; background:#fff;">
+            <button type="submit" class="btn btn-primary">上传</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2 class="card-title">🕵️ 审计日志 <span style="font-size:13px; color:var(--muted);">({{ audit_logs|length }} 条 · 倒序)</span></h2>
+    <div style="display:flex; flex-direction:column; gap:0;">
+        {% for log in audit_logs %}
+        <div style="display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border);">
+            <div style="flex-shrink:0; color:var(--muted); font-size:13px; min-width:120px;">
+                {{ log.timestamp|date:"Y-m-d H:i" }}
+            </div>
+            <div>
+                <span class="badge badge-published" style="background:var(--primary-soft); color:var(--primary-dark);">
+                    {{ log.get_operation_display }}
+                </span>
+                <span class="meta-text">操作人：{{ log.operator|default:"—" }}</span>
+                <div style="font-size:13px; color:var(--text); margin-top:4px;">{{ log.diff }}</div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="text-align:center; padding:24px 0; color:var(--muted);">暂无审计记录</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

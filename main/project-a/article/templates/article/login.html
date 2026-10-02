@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 · 文章管理系统</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root {
+            --primary: #2f6fed; --primary-dark: #1e4fc0;
+            --bg: #f4f6fb; --text: #23262f; --muted: #8a90a0;
+            --border: #e6e9f2; --danger: #e5484d; --radius: 16px;
+            --shadow: 0 10px 30px rgba(30,60,150,.12);
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: linear-gradient(140deg, #e8f0fe 0%, #f4f6fb 45%, #e3fbf6 100%);
+            color: var(--text);
+        }
+        .login-card {
+            width: 380px;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 38px 34px;
+            border: 1px solid var(--border);
+        }
+        .logo {
+            width: 56px; height: 56px;
+            margin: 0 auto 14px;
+            border-radius: 16px;
+            background: linear-gradient(120deg, var(--primary), #0bb6a5);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+        }
+        h1 { text-align: center; font-size: 22px; margin: 0 0 6px; }
+        .sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 26px; }
+        label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+        input {
+            width: 100%; box-sizing: border-box;
+            padding: 11px 14px;
+            margin-bottom: 18px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border .2s, box-shadow .2s;
+            font-family: inherit;
+        }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47,111,237,.15); }
+        button {
+            width: 100%; padding: 12px;
+            background: linear-gradient(120deg, var(--primary), #0bb6a5);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: transform .15s, box-shadow .2s;
+        }
+        button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(47,111,237,.3); }
+        .error {
+            background: #fdecec; color: #7f1d1d;
+            border: 1px solid #f5c2c2; border-radius: 10px;
+            padding: 10px 14px; font-size: 14px; margin-bottom: 18px;
+        }
+        .back { text-align: center; margin-top: 18px; font-size: 13px; }
+        .back a { color: var(--primary); text-decoration: none; }
+        .back a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">📄</div>
+        <h1>欢迎回来</h1>
+        <p class="sub">登录文章管理系统</p>
+        {% if form.errors %}
+        <div class="error">用户名或密码错误，请重试。</div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <label>用户名</label>
+            {{ form.username }}
+            <label>密码</label>
+            {{ form.password }}
+            <button type="submit">登 录</button>
+        </form>
+        <div class="back"><a href="/articles/">← 返回文章列表</a></div>
+    </div>
+</body>
+</html>
